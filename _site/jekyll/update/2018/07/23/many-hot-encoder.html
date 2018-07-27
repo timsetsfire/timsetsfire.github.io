@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Many Hot Encoder | Insert punny data science title</title>
+<meta name="generator" content="Jekyll v3.8.3" />
+<meta property="og:title" content="Many Hot Encoder" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="source /home/tim/.rvm/scripts/rvm" />
+<meta property="og:description" content="source /home/tim/.rvm/scripts/rvm" />
+<link rel="canonical" href="http://localhost:4000/jekyll/update/2018/07/23/many-hot-encoder.html" />
+<meta property="og:url" content="http://localhost:4000/jekyll/update/2018/07/23/many-hot-encoder.html" />
+<meta property="og:site_name" content="Insert punny data science title" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2018-07-23T23:05:00-04:00" />
+<script type="application/ld+json">
+{"description":"source /home/tim/.rvm/scripts/rvm","@type":"BlogPosting","headline":"Many Hot Encoder","dateModified":"2018-07-23T23:05:00-04:00","url":"http://localhost:4000/jekyll/update/2018/07/23/many-hot-encoder.html","datePublished":"2018-07-23T23:05:00-04:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/jekyll/update/2018/07/23/many-hot-encoder.html"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Insert punny data science title" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Insert punny data science title</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Many Hot Encoder</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2018-07-23T23:05:00-04:00" itemprop="datePublished">Jul 23, 2018
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>source /home/tim/.rvm/scripts/rvm</p>
+
+<p>This post explores the solution to the <em>Many Hot Encoder</em> problem.  I’m dubbing this as <em>Many Hot Encoder</em> because I don’t know what else to call this problem.  It may or may not be common, but it is something that I have encountered more than once in my work and I think it is worth sharing with others.  Before getting into Many Hot Encoding, we’ll quickly cover <em>One Hot Encoding</em></p>
+
+<h2 id="one-hot-encoding">One Hot Encoding</h2>
+
+<p>I image most people reading this post have some experience with One Hot Encoding of Categorical variables, but for those who aren’t familiar, One Hot Encoding (or OHE), is a way transform / encode categorical so that it can be included in machine learning models.</p>
+
+<p>As an example, suppose we have a dataset of subjects, along with a city in which the subject lives.  The field, which we will call <code class="highlighter-rouge">city</code> is a categorical variable and we are interested in seeing if the city in which the subject lives can used to explain the variation in the subject’s income.  The defacto encoding of the <code class="highlighter-rouge">city</code> field would be a One Hot Encoding.  Given <em>n</em> unique cities in the dataset, the One Hot Encoding will create <em>n</em> new fields, one for each city, then when the subject is recorded to live in a city, the corresponding city column is set 1, while all other columns are set to 0.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>id</th>
+      <th>city</th>
+      <th>boston</th>
+      <th>nyc</th>
+      <th>tokyo</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>boston</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>nyc</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>tokyo</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>boston</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>tokyo</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>tokyo</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>..</td>
+      <td>..</td>
+      <td>..</td>
+      <td>..</td>
+      <td>..</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="many-hot-encoder">Many Hot Encoder</h2>
+
+<p>I don’t know if it is appropriate to say that the <em>Many Hot Encoder</em> is an extension of the <em>One Hot Encoder</em>, but I think it is easily understood as an extension.  Suppose you have a dataset where each record is a subject id, the subject id is not necessarily unique, meaning, it may appear more than once.  This would be typical in a transaction dataset, where records represent a transaction, or a line item from a transaction.  Items / features caught in a transaction</p>
+
+<ol>
+  <li>subject id</li>
+  <li>item name / sku / product number</li>
+  <li>cost of item</li>
+</ol>
+
+<p>Another example of such a dataset could be a dataset of users and movies they have seen in the past year - and suppose you want to build a model to use past movie views to predict a future movie view.<br />
+From here there would be a wealth of information.</p>
+
+<!-- [__One Hot Encoding__](http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.OneHotEncoder.html) Encode categorical integer features using a one-hot aka one-of-K scheme.
+The input to this transformer should be a matrix of integers, denoting the values taken on by categorical (discrete) features. The output will be a sparse matrix where each column corresponds to one possible value of one feature. It is assumed that input features take on values in the range [0, n_values).
+This encoding is needed for feeding categorical data to many scikit-learn estimators, notably linear models and SVMs with the standard kernels.
+Note: a one-hot encoding of y labels should use a LabelBinarizer instead. -->
+
+<!-- source /home/tim/.rvm/scripts/rvm -->
+
+<p>This is very useful, but there are different instances where a similar type of feature construct would be
+useful for certain ML application.  Let’s suppose that you have collected transaction data, three columns in total:</p>
+<ol>
+  <li>user id - user id associated with the transaction</li>
+  <li>movie - name of movie</li>
+</ol>
+
+<figure class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="n">printHi</span><span class="o">(</span><span class="n">name</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=</span> <span class="o">{</span>
+  <span class="n">println</span><span class="o">(</span><span class="n">s</span><span class="s">"Hi, $name"</span><span class="o">)</span>
+<span class="o">}</span>
+<span class="n">printHi</span><span class="o">(</span><span class="s">"Tom"</span><span class="o">)</span>
+<span class="o">#</span><span class="k">=&gt;</span> <span class="n">prints</span> <span class="ss">'Hi,</span> <span class="nc">Tom</span><span class="o">'</span> <span class="n">to</span> <span class="nc">STDOUT</span><span class="o">.</span></code></pre></figure>
+
+
+  </div><a class="u-url" href="/jekyll/update/2018/07/23/many-hot-encoder.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Insert punny data science title</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Insert punny data science title</li><li><a class="u-email" href="mailto:timsetsfire@gmail.com">timsetsfire@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/timsetsfire"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">timsetsfire</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>This blog is a place where I like to explore things I&#39;m interested in or have been stumped by in the past.  Hopefully my explorations will help others!</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
