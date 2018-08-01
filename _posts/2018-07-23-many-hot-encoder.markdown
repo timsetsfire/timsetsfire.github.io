@@ -126,7 +126,7 @@ val ohe = users.map{
 
 ## Using Spark
 
-The solution in spark is significantly easier.  A lot of smart people have put in a lot of hard work to make this solution very straight forward.
+The solution in Spark is very straight forward.
 
 We'll assume that you already have a `SparkContext` available as `sc`.  Furthermore, we'll suppose that the dataset is in a Spark DataFrame called `df`.
 
