@@ -45,7 +45,7 @@ The main shuffle operation I found in breeze was located in `breeze.linalg.shuff
 playing around with it, it will either shuffle the entire matrix, the rows, or the columns, but when shuffling, it will do the rows or columns
 independently.  
 
-{ %highlight }
+{ %highlight %}
 scala> x
 res78: breeze.linalg.DenseMatrix[Int] =
 1  2
@@ -57,7 +57,7 @@ res79: breeze.linalg.DenseMatrix[Int] =
 3  6
 5  2
 1  4
-{ %end highlight }
+{ %endhighlight% }
 
 Or you can shuffle with anything that is like `Seq[Int]`.  But, the issue (maybe non-issue) with this is that the return is not a `DenseMatrix`, but a
 `breeze.linalg.SlicedMatrix[Int, Int, A]` where `A <: AnyVal`, and if you attempt a Matrix multiply, it returns the general `breeze.linalg.Matrix[A]`.  
@@ -70,7 +70,7 @@ The `BitVector` is a Vector of Boolean values, essentially allowing you to turn 
 If there are more / better ways to perform slicing, please let me know.  Using `Range` the return is `DenseMatrix`.  Using antyhing else, the return appears to
 be `SlicedMatrix[Int, Int, A]`, where `A <: AnyVal`.  
 
-{ %highlight }
+{ %highlight %}
 scala> val bv = BitVector(true, false, false)
 bv: breeze.linalg.BitVector = BitVector(0)
 
@@ -82,7 +82,7 @@ res88: breeze.linalg.DenseMatrix[Int] =
 
 scala> x(bv, ::)
 res89: breeze.linalg.SliceMatrix[Int,Int,Int] = 1  2
-{ %end highlight}
+{ %endhighlight%}
 
 So far, not so bad, but I was hoping for something that would always return something consistent in terms of the data type.  
 
@@ -93,22 +93,22 @@ encourage one to check out the this nice [numpy cheatsheet for nd4j](https://git
 
 Shuffling data is easy.  Suppose `x` is of type `org.nd4j.linalg.api.ndarray.INDArray` and has dimension $$n \times k$$
 
-{ %highlight scala }
+{ %highlight scala% }
 import org.nd4j.linalg.factory.Nd4j
 
 Ndj4.shuffle(x, 0) // to shuffle the columns
 Nd4j.shuffle(x, 1) // to shuffle the rows
-{ %end highlight }
+{ %endhighlight% }
 
 It is important to note that this shuffling occurs in place!
 
 Slicing is simple as well
 
-{ %highlight scala }
+{ %highlight scala% }
 
 val xSubSet = x.getRows( rowsToGet:\_\*)
 
-{ %end highlight }
+{ %endhighlight% }
 
 This is not creating a new `INDArray` of the `rowsToGet`, but referencing them.  So any changes made inplace to `xSubSet` are
 made to `x` - I'm pretty sure.  This way you always know the type you are dealing with.  There is enough information here to make the choice,
