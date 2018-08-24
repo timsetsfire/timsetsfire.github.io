@@ -9,7 +9,7 @@ math: math.html
 
 {% include {{ page.math }} %}
 
-# Neural Networks from Scratch
+### Neural Networks from Scratch
 
 ## Motivation
 
@@ -20,7 +20,15 @@ scratch (in Python) that mimicked TensorFlow.
 I decided that it would be fun to do the same in Scala, and attempt to add more functionity, by adding
 several cost and activation functions for use in training a neural network.
 
-# Choosing a Linear Algebra Library.    
+Over the next several posts, we'll cover
+* Choosing a linear algebra Library
+* Approach to the Framework
+* Cost functions
+* Activation Functions
+* Simple Neural Network (on MNIST)
+* Generative Adversarial Networks (on MNIST) --- hopefully.  
+
+### Choosing a Linear Algebra Library.    
 
 ## Considerations
 
