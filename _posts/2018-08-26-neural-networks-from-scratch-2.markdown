@@ -3,15 +3,17 @@ layout: post
 title:  "Neural Networks from Scrach Part 2"
 date:   2018-08-20 22:05:00 -0400
 categories: jekyll update
-
+math: true
 ---
 
 
 
 ## Implementing Lasso with ND4J
 
+First off - many thanks to [deep_thesis](http://deeplearningthesis.com/jekyll/mathematics/programming/2018/01/14/setting-up-jekyll.html) for help on setting up Jekyll for math!
+
 This post, second in the neural nets from scratch entries, will focus on using ND4J / ND4S
-to implement Lasso for linear regression.  
+to implement Lasso for linear regression (from scratch)  
 
 This will get us comfortable with the way we use ndarrays in Scala and operations that will
 be used throughout our neural network framework \( and then some! \).  
@@ -22,11 +24,7 @@ Least Absolute Shrinkage and Selection Operator, or Lasso for short, is a very p
 
 We'll consider the Lasso problem as
 
-$$
-\begin{align}
-argmin_{b} \|y - xb\|_2 + \lambda \|b\|_1
-\end{align}
-$$.  
+$$argmin_{b} \|y - xb\|_2 + \lambda \|b\|_1$$
 
 Here $$y$$ is a vector of continuous labels and $$x$$ is a matrix of features.
 
