@@ -26,7 +26,11 @@ We'll consider the Lasso problem as
 
 $$argmin_{b} \|y - xb\|_2 + \lambda \|b\|_1$$
 
-Here $$y$$ is a vector of continuous labels and $$x$$ is a matrix of features.
+Here $$y$$ is a vector of continuous labels, $$x$$ is a matrix of features, $$b$$ is a vector
+of weights and $$\lambda$$ is a hyperparameter used to control the sparsity of the regression solution.  For $$\lambda = 0$$ we have the standard solution and as $$\lambda$$ approaches $$\max |x^Ty| / n$$, $$b$$ goes to $$0$$.  
+
+One cannot rely on regular gradient methods of optimization given this function is not differentiable on its domain, thus we'll use coordinate descent to solve.
+ 
 
 ## Gettin starting
 
