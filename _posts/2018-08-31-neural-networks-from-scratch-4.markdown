@@ -8,6 +8,8 @@ math: true
 
 ## Vertices
 
+Still in progress - (as are all other neural net posts)
+
 In scala, we typically favor immutable data types, but in some intances, especially this one, it is unavoidable.  Our approach to neural networks in scala is based on creating nodes.  Each node will have set of inbound nodes and outbound nodes.  For our purposes, we will treat the inbound nodes as an immutable sequence, which is created during the construction of the node, and the outbound nodes will be a mutable sequence - only because the nodes our constructed node will feed have not be constructed yet.  
 
 The way we'll handle this, when a node is constructed, we'll add the constructed node to the set of outbound vertex for each inbound vertex.
