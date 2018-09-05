@@ -158,6 +158,32 @@ res39: org.nd4j.linalg.api.ndarray.INDArray =
 
 The `->` operator will take all, while `0 to 6 by 3` will take then 0 and 3 columns of the matrix.  This type of slicing will return a reference, so be careful if you act on the elements of the sub matrix, as you will change the original.  
 
+### Slicing Tensors
+
+As pointed out before, creating Tensors in `ND4J` is pretty simply.  
+{% highlight scala %}
+import org.nd4j.linalg.factory.Nd4j
+
+scala> val tensor = Nd4j.create( Array.fill{8}{util.Random.nextGaussian}, Array(1,2,2,2), 'c')
+tensor: org.nd4j.linalg.api.ndarray.INDArray =
+[[[[-1.03, 1.15],
+   [0.30, 0.84]],
+
+  [[0.12, -0.18],
+   [0.60, -0.47]]]]
+
+{% endhighlight %}
+
+Slicing this tensor is fairly intuitive with imported implicits.
+
+{% highlight scala %}
+import org.nd4s.Implicits._
+scala> tensor(0,1,->,->)  // tensor(0,1,->) also works
+res0: org.nd4j.linalg.api.ndarray.INDArray =
+[[0.12, -0.18],
+ [0.60, -0.47]]
+{% endhighlight %}
+
 
 ## Elementwise operations
 
@@ -173,7 +199,7 @@ I really like how ND4J handles broadcasting - it doesn't!  There are methods ava
 
 ## Matrix Multiplication
 
-Given two `INDArray`s, `x` and `y`, that have shapes which make them compatible for matrix mutliplication, we can matrix multiply via
+Given two objects, `x` and `y`, of type `INDArray`, that have shapes which make them compatible for matrix mutliplication, we can matrix multiply via
 
 {% highlight scala %}
 x.mmul(y)

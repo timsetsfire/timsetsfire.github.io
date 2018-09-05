@@ -10,40 +10,46 @@ categories: jekyll update
 
 This post came about from a lecture I had during my Udacity Deep Learning Nano Degree.  
 The purpose of the lecture was to show how to build a neural network framework from
-scratch \(in python\\) that mimicked TensorFlow.  
+scratch (in Python) that mimicked TensorFlow.  
 
-I decided that it would be fun to do the same in Scala, and attempt to add more functionity, by adding several cost and activation functions for use in training a neural network.
+I decided that it would be fun to do the same in Scala, and attempt to add more functionity, and ultimately, be able to train an generative adversarial neural network on the MNIST dataset.  
 
 Over the next several posts, I'll discuss
 * Choosing a linear algebra Library
-* Approach to the Framework
-* Cost functions
+* Common operations in ND4J.  
+* Linear Regression and Stochastic Gradient Descent in ND4J
+* Approach to the Neural Network Framework
 * Activation Functions
+* Cost functions
 * Simple Neural Network on MNIST
-* Generative Adversarial Networks on MNIST --- hopefully.  
+* Generative Adversarial Networks on MNIST.  
 
 ## Choosing a Linear Algebra Library   
 
+The focus of this first post will be around which Linear Algebra library to use.  While there are many, I only considered between Breeze and ND4J / ND4S.  
+
 ### Considerations
 
-Thinking about neural networks and what is needed to be accomplished with the data meant focusing  on
-how to carry out basic linear algebra ops as well manipulation of n-dimensional arrays.  This includes the following:
+Thinking about neural networks and what is needed to be accomplished with the data meant focusing  on how to carry out basic linear algebra operations as well manipulation of n-dimensional arrays.  This includes the following:
 
 * shuffling of data along an axis
 * slicing data along an axis.  
 * matrix multiplies and addition
-* element wise operations
+* elementwise operations
 
 ### Breeze
 
-Prior to this exercise, my weapon of choice was [Breeze](https://github.com/scalanlp/breeze).  I was originally introduced to
-it when I was going through Pascal Bungion's book [Scala for Data Science](https://pascalbugnion.net/book.html) and given my experience with Matlab and Numpy I found the syntax very familiar and comfortable.  
+Prior to this exercise, my weapon of choice was [Breeze](https://github.com/scalanlp/breeze).  I was originally introduced to it when I was going through Pascal Bungion's book [Scala for Data Science](https://pascalbugnion.net/book.html) and given my experience with Matlab and Numpy I found the syntax very familiar and comfortable.  
 
-Started with breeze, I started to think through how I would accomplish the things listed above.  Basic matrix and elementwise operations were a easy breeze-y lemon squeezy, but slicing and shuffling where difficult difficult lemon difficult.  
+Starting with breeze, I began to think through how I would accomplish the things listed above.  Basic matrix and elementwise operations were a easy breeze-y lemon squeezy, but slicing and shuffling where difficult difficult lemon difficult.  
 
 The main shuffle operation I found in breeze was located in `breeze.linalg.shuffle`.  This implements the Fisher-Yates shuffle and based on
-playing around with it, it will either shuffle the entire matrix, the rows, or the columns, but when shuffling, it will do the rows or columns
-independently.  
+playing around with it, it will either shuffle the entire matrix, the rows, or the columns, but when shuffling, it will do the rows or columns independently.  
+
+In Breeze, you can mimic Numpy operations on axes with the following syntax
+`x(::, *)` will operate on axis 1, while x(*,::) will operate on axis 0.  
+
+For example, consider below, where I want to shuffle the order of the rows, but you'll notice that the each column is shuffle indepenet of the others.  
 
 {% highlight scala %}
 scala> val x = new DenseMatrix(3, 2, (1 to 6).toArray )
@@ -58,9 +64,6 @@ res0: breeze.linalg.DenseMatrix[Int] =
 5  2
 1  4
 {% endhighlight %}
-
- In Breeze, you can mimic Numpy operations on axes with the following syntax
-`x(::, *)` will operate on axis 1, while x(*,::) will operate on axis 0.  
 
 Shuffling can also be accomplished with anything that is like `Seq[Int]`.  But, the issue \(maybe non-issue\\) with this is that the return is not a `DenseMatrix`, but a `breeze.linalg.SlicedMatrix[Int, Int, A]` where `A <: AnyVal`, and if you attempt a Matrix multiply, it returns the general `breeze.linalg.Matrix[A]`.  I don't think this is too big an issue, but may introduce typing problems when writing the frame work.  I should say it will introduce issues, since I'm not that great with Scala!  
 
@@ -82,6 +85,8 @@ res0: breeze.linalg.SliceMatrix[Int,Int,Int] = 1  2
 {% endhighlight %}
 
 So far, not so bad, but I was hoping for something that would always return something consistent in terms of the data type.  
+
+I think another reason at the time was storage of Breeze matrices.  I think loading large matrices proved problematic and I would run out of heap space - this is no issue in ND4J since their ndarrays are stored off heap.  
 
 ### ND4J
 
@@ -157,12 +162,9 @@ res68: org.nd4j.linalg.api.ndarray.INDArray =
  [10.00, 4.00, 6.00]]
 {% endhighlight %}
 
-Aside from the considerations, I have considered also the fact that leanrning a new library would be
-particularly useful.  SO even if someone reading this points out embarrassingly simple solutions
-to what I'm moaning about above, I'd still stick by my choice of ND4J - just to learning something new.  
+Aside from the considerations, I have considered also the fact that learning a new library would be particularly useful.  So, even if someone reading this points out embarrassingly simple solutions to what I'm moaning about above, I'd still stick by my choice of ND4J - just to learning something new.  
 
-One other thing that may be worth pointing out.  ND4J can handle tensors, while I haven't figured out if Breeze can.  
-
+One other thing that may be worth pointing out.  ND4J can handle tensors, while I haven't figured out if Breeze can.  Tensors in this context are generalization of matrices to higher dimensions.  A good example would be an image for which we have 3 matrices of 28 by 28, with each matrix representing the R, G, and B values for the image.  We would have a tensor of shape (1, 3, 28, 28)
 For example
 
 {% highlight scala %}
