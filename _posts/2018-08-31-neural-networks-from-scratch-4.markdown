@@ -6,56 +6,42 @@ categories: jekyll update
 math: true
 ---
 
-## Graphs
+## Feed Forward Neural networks
 
-Still in progress - (as are all other neural net posts)
+Here we will begin to get into how we will model our neural network framework.  Per Deep Learning by Goodfellow, the feedforward neural network is called such because
 
-Our approach to neural networks in scala will be based on graphs.  A graph is what is meant by a network in the a neural network and is a structure made up of edges and vertices (but we'll call vertices nodes).  Nodes will represent
+* (feedforward) information flows through the function being evaluated from the input $$x$$, through intermediate computations used to define $$f$$, and finally to the output $$y$$.  We are not considering any feedback connections
+* (network) They are typically represented by composing together many different functions.  The model is associated with a directy acyclic graph describing how functions are componsed together.
+* (neural) The models are loosly inspired by neuroscience.
 
-* data
-* operations: addition, multiplication, etc
-* activation functions: Softmax, ReLU
-* cost functions
-
-Each node will have a value, and the edges which connect nodes, have direction, and will tell us how we pass the values of nodes through the graph.  Consider the following graph
+We will begin our framework reviewing a simple graph and how we will represent it within our framework.  
 
 ![add](/assets/add.png)
 
-There are three nodes, `X`, `Y`, `Z`.  The nodes `X` and `Y` have edges connecting it to the third node `Z`.  The `+` symbol is meant to show that we are adding the value of `X` and the value of `Y` to get the value of `Z`.  Here `Z` is an outbound node for both `X` and `Y`, while `X` and `Y` are both inbound nodes for `Z`.  To model this, our `Node` class will have a the following fields
+There are three nodes, `X`, `Y`, `Z`.  There are two directed edges in this graph, one from `X` to `Z` and one from `Y` to `Z`.  The edges, together with `+` show that we are adding `X` and `Y` to get `Z`.  Here, when we say we are acting on nodes, we are really acting on the values of the node, in this case an n-dimensional array.  Since neither `X` nor `Y` have a parent, it makes sense to refer to them as Input nodes, and based on the relationship between `X`, `Y`, and `Z` it makes sense to call `Z` and Add node.  So, to start our `Node` class will have a the following fields
 * `value` - the value of the node
 * `inboundNodes` - a sequence of all nodes feeding into the current node
 * `outboundNodes` - a sequence of all nodes the current node feeds into
-and the following methods
 
 And so far, one method
-* `forward` - tells how to forward values through the graph.  
+* `forward` - tells how to forward values through the graph.  In the example of the Add node, the `forward` method would add the values of the inbound nodes.
 
-In scala, we'll model the base class Node as follows  
+In scala, we'll model the base class Node, and two classes which extend Node: Input and Add.  
 
 {% highlight scala %}
-package miniflow.nn
+import org.nd4j.linalg.api.ndarray.INDArray
+import org.nd4s.Implicits._
+import scala.collection.mutable.ArrayBuffer
+
 class Node(val inboundNodes: Node*) {
   var value: INDArray = null
-  val outboundNodes = ArrayBuffer[Node]
+  val outboundNodes = ArrayBuffer[Node]()
   inboundNodes.foreach { n => n.outboundNodes += this }
   def forward(value: INDArray = null) = {
     this.value = value
   }
 }
-{% endhighlight %}
-
-In terms of the graph we presented above, that would look like
-
-{% highlight scala %}
-val x = new Node()
-val y = new Node()
-val z = new Node(x,y)
-{% endhighlight %}
-
-The only issue here is that we have not adequately capture how `X` and `Y` relate to `Z`.  We can improve this with the following classes.
-
-{% highlight scala %}
-class Input() exnteds Node()
+class Input() extends Node()
 class Add(x: Node, y: Node) extends Node(x,y) {
   override def forward(value: INDArray = null) = {
     if(value != null) this.value = value
@@ -64,29 +50,37 @@ class Add(x: Node, y: Node) extends Node(x,y) {
 }
 {% endhighlight %}
 
-Now, let's revisit creating our graph in scala
+In terms of the graph presented above, it's construction in scala would look like
 
 {% highlight scala %}
 scala> val x = new Input()
-x: Input = Input@7e18a0db
+x: Input = Input@b8b1ec8
 
 scala> val y = new Input()
-y: Input = Input@415b4648
+y: Input = Input@5e0cd349
 
 scala> val z = new Add(x,y)
-z: Add = Add@4dea2521
+z: Add = Add@363f9b87
 
 scala> x.forward(Nd4j.ones(3,3))
 
-scala> y.forward(Nd4j.ones(3,3))
+scala> y.forward(Nd4j.ones(3,3).mul(4))
 
 scala> z.forward()
 
-scala> println(z.value)
-[[2.00, 2.00, 2.00],
- [2.00, 2.00, 2.00],
- [2.00, 2.00, 2.00]]
+scala> print(z.value)
+[[5.00, 5.00, 5.00],
+ [5.00, 5.00, 5.00],
+ [5.00, 5.00, 5.00]]
 
+scala> z.inboundNodes
+res6: Seq[Node] = WrappedArray(Input@b8b1ec8, Input@5e0cd349)
+
+scala> x.outboundNodes
+res7: scala.collection.mutable.ArrayBuffer[Node] = ArrayBuffer(Add@363f9b87)
+
+scala> y.outboundNodes
+res8: scala.collection.mutable.ArrayBuffer[Node] = ArrayBuffer(Add@363f9b87)
 {% endhighlight %}
 
 Great! But, I would prefer to write `val z = x + y`, instead of `val z = new Add(x,y)`.  This would give the construction a much nicer feel.  This can be done by adding a `+` method to the `Node` class.
@@ -98,20 +92,34 @@ class Node(val inboundNodes: Node*) {
 }
 {% endhighlight %}
 
-Now we can write `val z = x + y`, which is much nice that `val z = new Add(x,y)`.  You might ask why we didn't just add an add method directly to the Node class instead of create a special Add node.  The reason for this is because we would want to have many methods for a node, each of which would require us to calculate gradients, and it is much easier to modularize the operations as class instead of cramming them all into Node as methods.  
+You might ask why we didn't just add an add method directly to the Node class instead of create a special Add node.  The reason for this is because we would want to have many methods for a node, each of which would require us to calculate gradients, and it is much easier to modularize the operations as class instead of cramming them all into Node as methods.  
 
-You could go through and create new Node subtypes to represent other operations such as matrix multiplication and hadamard multiplication.  
+We'll be using the node model to represent
+
+* inputs
+* operations: addition, multiplication, etc
+* activation functions: Softmax, ReLU
+* cost functions
+
 
 ## Linear Regression Graph
 
-Next, let's consider what a linear regression graph would look like.  We would have two `Input` nodes, one for features and one for labels.  We would need something to represent the weights and bias of the linear regression, for this we'll create a new Node subtype - `Variable`. We'll also create a new node which is meant to represent the linear transformation `Xw + b`, where `X` is an `Input` and `W` and `b` are of type `Variable`
+Next, let's consider what a linear regression graph would look like.  We would have two `Input` nodes, one for features and one for labels.  We would need something to represent the weights and bias of the linear regression, for this we'll create a new Node subtype - `Variable`. We'll also create a new node which is meant to represent the linear transformation `Xw + b`, where `X` is of type `Input` and `W` and `b` are of type `Variable`, and finally, a Cost function, which will take our actual and predicted to assess loss - the obvious choice is MSE.   
 
 {% highlight scala %}
 class Variable() extends Node()
 
 class Linear(x: Input, w: Variable, b: Variable) extends Node(x,w,b) {
   override def forward(value: INDArray = null) = {
-    (x.value mmul w.value) addRowVector b.value
+    this.value = (x.value mmul w.value) addRowVector b.value
+  }
+}
+
+class Mse(y: Input, yhat: Node) extends Node(y,yhat){
+  override def forward(value: INDArray = null): Unit = {
+    val obs = y.value.shape.apply(0).toDouble
+    val diff = y.value - yhat.value
+    this.value = (diff * diff).sum(0).sum(1) / (obs.toDouble)
   }
 }
 {% endhighlight %}
@@ -131,6 +139,9 @@ b: Variable = Variable@5e9b6e6e
 scala> val yhat = new Linear(x,w,b)
 yhat: Linear = Linear@1951961b
 
+scala> val mse = new Mse(y, yhat)
+mse: Mse = Mse@6ea57b84
+
 scala> x.forward( Nd4j.randn(10,3))
 
 scala> w.forward( Nd4j.randn(3,1))
@@ -139,10 +150,15 @@ scala> b.forward( Nd4j.randn(1,1))
 
 scala> yhat.forward()
 
+scala> mse.forward()
+
 scala> println(yhat.value)
-[0.07, 0.27, -5.67, -0.66, 0.52, -2.18, 1.41, -4.42, -1.44, -7.95]
+[-3.05, -1.38, -0.73, -1.41, -0.84, 0.21, 1.40, 1.58, -0.59, -2.55]
+
+scala> println(mse.value)
+1.91
 {% endhighlight %}
 
-So far so good, but we have omitted a very important part of our model so far - how to calculate derivatives?  This is of utmost importance when we want to start training our neural networks and it will require us to create back propagation methods for all the nodes we want to include in out neural net, e.g., activation functions, cost functions, et cetera.  
+So far so good, with one exception - backward propagation, or backprop for sorth.  This is used to calculated the gradients throughout the graph which then can be used to "learn" the graph.   require us to create back propagation methods for all the nodes we want to include in out neural net, e.g., activation functions, cost functions, et cetera.  
 
 Next post will focus on back prop!
