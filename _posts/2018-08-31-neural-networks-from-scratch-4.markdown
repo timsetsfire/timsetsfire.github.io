@@ -152,6 +152,9 @@ scala> yhat.forward()
 
 scala> mse.forward()
 
+scala> println(y.value)
+[-1.25, -0.94, -0.82, -1.34, -0.61, 0.14, -0.83, -0.80, -1.00, -0.37]
+
 scala> println(yhat.value)
 [-3.05, -1.38, -0.73, -1.41, -0.84, 0.21, 1.40, 1.58, -0.59, -2.55]
 
