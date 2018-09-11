@@ -98,7 +98,7 @@ We'll be using the node model to represent
 
 * inputs
 * operations: addition, multiplication, etc
-* activation functions: Softmax, ReLU
+* activation functions: Softmax, ReLU, etc
 * cost functions
 
 
