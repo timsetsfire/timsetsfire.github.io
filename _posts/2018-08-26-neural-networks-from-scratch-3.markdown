@@ -60,8 +60,7 @@ object Regression {
     println( f"r^2: ${r2(ys,yhat)}%2.3f")
   }
 }
-}
-
+Regression.run()
 {% endhighlight %}
 
 Now, open terminal and run `sbt console`, and once you are in REPL, run `:load code/regression.scala`
@@ -89,23 +88,23 @@ import org.nd4s.Implicits._
 import org.nd4j.linalg.ops.transforms.Transforms.{pow,normalizeZeroMeanAndUnitVariance=>stdize}
 import org.nd4j.linalg.inverse.InvertMatrix.invert
 
-object SgdRegression {
+def r2(y: INDArray, yhat: INDArray) = {
+  val rss = pow(y sub yhat,2)
+  val tss = pow(y.subRowVector(y.mean(0)),2)
+  1d - rss.sumT / tss.sumT
+}
+
+def cost(y: INDArray, x: INDArray, b: INDArray) = {
+ (y - x.mmul(b)).norm2T / y.shape.apply(0).toDouble
+}
+
+object SgdRegression extends App {
 
   def run() = {
 
     // read in data
     val x = Nd4j.readNumpy("resources/boston_x.csv", ",")
     val y = Nd4j.readNumpy("resources/boston_y.csv", ",")
-
-    def r2(y: INDArray, yhat: INDArray) = {
-      val rss = pow(y sub yhat,2)
-      val tss = pow(y.subRowVector(y.mean(0)),2)
-      1d - rss.sumT / tss.sumT
-    }
-
-    def cost(y: INDArray, x: INDArray, b: INDArray) = {
-     (y - x.mmul(b)).norm2T / y.shape.apply(0).toDouble
-    }
 
     // standardize data.  
     // using the imported stdize will standardize inplace
@@ -148,7 +147,6 @@ object SgdRegression {
 
     val yhat = xs.mmul(b)
     println(f"r^2: ${r2(ys, yhat)}%2.3f")
-    }
   }
 }
 SgdRegression.run()
