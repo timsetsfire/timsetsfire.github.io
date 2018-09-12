@@ -1,17 +1,24 @@
 ---
 layout: post
 title:  "Neural Networks from Scrach Part 5"
-date:   2018-09-13 22:05:00 -0400
+date:   2018-09-15 22:05:00 -0400
 categories: jekyll update
 math: true
 ---
 
 ## Function composition
 
-Function composition is the backbone of our neural network architecture.  We feed data in through an input $x$ and we flow the data through many intermediate functions to generate an output.  So far we have discussed the general idea behind the neural network and how we'll represent the network with directed acyclic graphs.  We also gave some illustrations how to represent a linear regression in our framework, but we still don't have a way to "learn" the graph, that is, estimate the weights of the graph which are used to define our neural network.  
+Function composition is the backbone of our neural network architecture.  It can be easily understood as the application of one function to the result of another function to produce a third function.  
 
-The main workhorse in learning graphs are gradient based optimization methods - this means we need a method to calculate gradients
-Suppose that we have a function $h = (g \circ f)(x)$, read $g$ composed with $f$ of $x$.  This is the backbone of our feed forward neural network (also multilayer perceptron - or MLP for short).  In the MLP, function composoition is used to define a function $f$ which
+Concretely, Suppose that we have a function $h = (g \circ f)(x)$, read $g$ composed with $f$ of $x$.  It is understood, that $f: X \to Y$, g: Y \to Z$, then $h: X \to Z$.  In the previous post, we used function composition to formalize the architecture for our neural network.  Moreover, we discussed how to feed data through our network (forward) and in doing so, we were doing the evaluation of a functions composed with functions.  As we left off with our linear regression graph, we still had not touched on an important part - how to learn the graph.  In this context learn is referrring to estimating the parameters of the network.  The standard way to learn neural networks is via gradient based optimization methods, which, obviously, requires us to compute gradients for our trainable parameters, which means we need to pay a visit to our old friend the chain rule!
+
+## Chain rule
+
+If we have a function $$(h \circ g \circ f ) (x)$$, we will calc its derivative via the chain rule as
+
+$$\frac{\partial h}{\partial x} = \frac{\partial g}{\partial f}\frac{\partial f}{\partial x}$$
+
+Here we are assuming the $f$ and $g$ are differentiable on their domain, thus $h$ is differentiable on its domain.  
 
 ## Automatic Differentiation
 
@@ -19,11 +26,47 @@ Straight from wikipedia
 
 > [Automatic Differentiation] exploits the fact that every computer program, no matter how complicated, executes a sequence of elementary arithmetic operations (addition, subtraction, multiplication, division, etc.) and elementary functions (exp, log, sin, cos, etc.). By applying the chain rule repeatedly to these operations, derivatives of arbitrary order can be computed automatically, accurately to working precision, and using at most a small constant factor more arithmetic operations than the original program.
 
-If we have a function $$(h \circ g \circ f ) (x)$$, we will calc its derivative via the chain rule as
+Consider the multivariate example $h(x,b) = \phi(f(x,b))$.  
 
-$$\frac{\partial h}{\partial x} = \frac{\partial h}{\partial g}\frac{\partial g}{\partial f}\frac{\partial f}{\partial x}$$
+Assuming that $\phi$ and $f$ are differentiable on their domain, we can calculate partials as follows
 
-We can either do a forward accumulation or a reverse accumulation of the derivative.  Forward accumulation would mean that we would first calc $$\partial f / \partial x$$ followed by $$\partial g / \partial f$$ and finally $$\partial h \partial g$$, while reverse accumulation would be, well, the reverse.  In function that we just described, going forward or in reverse really would not make a difference, but in a larger, more complex graph, you will realize significant speed up by use the reverse accumulation approach rather than the forward for the following reason
+$$\frac{\partial h}{\partial x} = \frac{\partial \phi}{\partial f}\frac{\partial f}{\partial b}$$
+
+and
+
+$$\frac{\partial h}{\partial b} = \frac{\partial \phi}{\partial f}\frac{\partial f}{\partial x}$$
+
+One thing worth pointing our at this point, both partial derivatives above involve a similar calculation, in particular $\frac{\partial \phi}{\partial f}$.  Now suppose that we have fixed values of $x$ and $b$, say $x'$ and $b'$.  We would have forwarded these values through the composition, stored all intermediate calculations, and then put everything together.  
+
+This is very easy application of the chain rule, but when we begin to compute gradients within our neural network, the calculations will not be so easy and we will utilize the method of automatic differentiation.  
+
+We can approach the evaluation of the derivative vai automatic differentiation in one of two ways
+
+* Forward accumulation
+* Reverse accumulation
+
+With forward accumulation we would first calc $$\partial f / \partial x$$ evaluated as $x',b'$ followed by $$\partial  \phi / \partial f$$ evaluated at $x', b'$, while reverse accumulation would be, well, the reverse, starting with $\partial \phi / \partial f$ evaluated at $x', b'$ then $\partial f / \partial x$ evaluated at $x', b'$.  
+
+One thing to keep in mind - we already forwarded $x', b'$ through the composition, so we have stored $f(x,b)$ and $\phi(f(x,b))$
+
+### Forward accumulation example
+
+$$\frac{\partial h}{\partial x}\bigg|_{x = \pi} = f'(\pi) g'(f(2\pi))$$
+
+The only new calc here is $f'(\pi)$ and $g'(2\pi)$
+
+### Backward accumulation example
+
+$$\frac{\partial h}{\partial x}\bigg|_{x = \pi} = g'(f(2\pi))f'(\pi) $$
+
+Same story here, the only new calc here is $f'(\pi)$ and $g'(2\pi)$
+
+For this example, it is not clear what the difference is - both methods result in the same number of calculations, but, in larger, more complex graphs, we will realize significant speed up by using the reverse method (aka back propagation)!
+
+Thing about it like this, suppose you have $h(y) = \phi(y), y = xb$. Computing this derivative via forward accumulation, you would calc $\phi'(y)$ twice, once for $\partial h / \partial x$ and once for $\partial h / \partial b$, but the backward method would only have you calcing $\phi'(y)$ onces
+
+
+In function that we just described, going forward or in reverse really would not make a difference, but in a larger, more complex graph, you will realize significant speed up by use the reverse accumulation approach rather than the forward for the following reason
 Forward accumulation will give the derivation of the output with respect to a single node, while reverse accumulation gives the derivative of the output with respect to all the nodes.  Check out [this great post on the topic](http://colah.github.io/posts/2015-08-Backprop/).  This reverse accumulation is exactly back propagation!!!
 
 
