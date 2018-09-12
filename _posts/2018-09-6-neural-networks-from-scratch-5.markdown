@@ -1,10 +1,31 @@
 ---
 layout: post
 title:  "Neural Networks from Scrach Part 5"
-date:   2018-09-04 22:05:00 -0400
+date:   2018-09-13 22:05:00 -0400
 categories: jekyll update
 math: true
 ---
+
+## Function composition
+
+Function composition is the backbone of our neural network architecture.  We feed data in through an input $x$ and we flow the data through many intermediate functions to generate an output.  So far we have discussed the general idea behind the neural network and how we'll represent the network with directed acyclic graphs.  We also gave some illustrations how to represent a linear regression in our framework, but we still don't have a way to "learn" the graph, that is, estimate the weights of the graph which are used to define our neural network.  
+
+The main workhorse in learning graphs are gradient based optimization methods - this means we need a method to calculate gradients
+Suppose that we have a function $h = (g \circ f)(x)$, read $g$ composed with $f$ of $x$.  This is the backbone of our feed forward neural network (also multilayer perceptron - or MLP for short).  In the MLP, function composoition is used to define a function $f$ which
+
+## Automatic Differentiation
+
+Straight from wikipedia
+
+> [Automatic Differentiation] exploits the fact that every computer program, no matter how complicated, executes a sequence of elementary arithmetic operations (addition, subtraction, multiplication, division, etc.) and elementary functions (exp, log, sin, cos, etc.). By applying the chain rule repeatedly to these operations, derivatives of arbitrary order can be computed automatically, accurately to working precision, and using at most a small constant factor more arithmetic operations than the original program.
+
+If we have a function $$(h \circ g \circ f ) (x)$$, we will calc its derivative via the chain rule as
+
+$$\frac{\partial h}{\partial x} = \frac{\partial h}{\partial g}\frac{\partial g}{\partial f}\frac{\partial f}{\partial x}$$
+
+We can either do a forward accumulation or a reverse accumulation of the derivative.  Forward accumulation would mean that we would first calc $$\partial f / \partial x$$ followed by $$\partial g / \partial f$$ and finally $$\partial h \partial g$$, while reverse accumulation would be, well, the reverse.  In function that we just described, going forward or in reverse really would not make a difference, but in a larger, more complex graph, you will realize significant speed up by use the reverse accumulation approach rather than the forward for the following reason
+Forward accumulation will give the derivation of the output with respect to a single node, while reverse accumulation gives the derivative of the output with respect to all the nodes.  Check out [this great post on the topic](http://colah.github.io/posts/2015-08-Backprop/).  This reverse accumulation is exactly back propagation!!!
+
 
 ## Backpropagation
 
@@ -103,17 +124,3 @@ $$
 Un-vectorizing these result gives $\partial H / \partial X = \phi'(X\beta)\beta^T$ and $\partial H / \partial \beta = X^T \phi'(X\beta)$!
 
 So if $\phi$ were equal to $(y - X\beta)^2$, it is clear how differentiating this with respect to $X$ and $\beta$ result in the $-X^T(y - X\beta)$ and $-(y - X\beta)\beta^T$ respectively.  
-
-## Automatic Differentiation
-
-Straight from wikipedia
-
-
-> [Automatic Differentiation] exploits the fact that every computer program, no matter how complicated, executes a sequence of elementary arithmetic operations (addition, subtraction, multiplication, division, etc.) and elementary functions (exp, log, sin, cos, etc.). By applying the chain rule repeatedly to these operations, derivatives of arbitrary order can be computed automatically, accurately to working precision, and using at most a small constant factor more arithmetic operations than the original program.
-
-If we have a function $$(h \circ g \circ f ) (x)$$, we will calc its derivative via the chain rule as
-
-$$\frac{\partial h}{\partial x} = \frac{\partial h}{\partial g}\frac{\partial g}{\partial f}\frac{\partial f}{\partial x}$$
-
-We can either do a forward accumulation or a reverse accumulation of the derivative.  Forward accumulation would mean that we would first calc $$\partial f / \partial x$$ followed by $$\partial g / \partial f$$ and finally $$\partial h \partial g$$, while reverse accumulation would be, well, the reverse.  In function that we just described, going forward or in reverse really would not make a difference, but in a larger, more complex graph, you will realize significant speed up by use the reverse accumulation approach rather than the forward for the following reason
-Forward accumulation will give the derivation of the output with respect to a single node, while reverse accumulation gives the derivative of the output with respect to all the nodes.  Check out [this great post on the topic](http://colah.github.io/posts/2015-08-Backprop/).  This reverse accumulation is exactly back propagation!!!
