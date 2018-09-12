@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Neural Networks from Scrach Part 5"
-date:   2018-09-15 22:05:00 -0400
+date:   2018-09-12 22:05:00 -0400
 categories: jekyll update
 math: true
 ---
