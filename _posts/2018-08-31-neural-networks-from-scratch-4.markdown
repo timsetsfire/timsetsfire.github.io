@@ -162,6 +162,6 @@ scala> println(mse.value)
 1.91
 {% endhighlight %}
 
-So far so good, with one exception - backward propagation, or backprop for sorth.  This is used to calculated the gradients throughout the graph which then can be used to "learn" the graph.   require us to create back propagation methods for all the nodes we want to include in out neural net, e.g., activation functions, cost functions, et cetera.  
+So far so good, with one exception - we haven't talked about how to learn this graph, i.e., learn the parameters of the graph.  The next post we'll talk about automatic differentiation and how we'll handle this in our framework.  This will help us figure out how to calculate the gradients for any optimization technique that can be used to learn the graph.  
 
-Next post will focus on back prop!
+Cheers!
