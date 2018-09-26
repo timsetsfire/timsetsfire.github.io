@@ -1,8 +1,9 @@
 ---
 layout: post
-title:  "Neural Networks from Scrach Part 4"
+title:  "Approach to the Neural Network Framework"
 date:   2018-09-01 22:05:00 -0400
-categories: jekyll update
+categories: neural networks from scratch in scala
+series: neural_networks
 math: true
 ---
 
@@ -165,3 +166,5 @@ scala> println(mse.value)
 So far so good, with one exception - we haven't talked about how to learn this graph, i.e., learn the parameters of the graph.  The next post we'll talk about automatic differentiation and how we'll handle this in our framework.  This will help us figure out how to calculate the gradients for any optimization technique that can be used to learn the graph.  
 
 Cheers!
+
+{% include series.html %}

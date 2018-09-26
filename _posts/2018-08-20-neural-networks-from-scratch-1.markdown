@@ -1,28 +1,11 @@
 ---
 layout: post
-title:  "Neural Networks from Scrach Part 1"
+title:  "Choosing a Linear Algebra Library for Scala"
 date:   2018-08-20 22:05:00 -0400
-categories: jekyll update
+categories: neural networks from scratch in scala
+series: neural_networks
 ---
 
-
-## Motivation
-
-This post came about from a lecture I had during my Udacity Deep Learning Nano Degree.  
-The purpose of the lecture was to show how to build a neural network framework from
-scratch (in Python) that mimicked TensorFlow.  
-
-I decided that it would be fun to do the same in Scala, and attempt to add more functionity, and ultimately, be able to train an generative adversarial neural network on the MNIST dataset.  
-
-Over the next several posts, I'll discuss
-* Choosing a linear algebra Library
-* Common operations in ND4J.  
-* Linear Regression and Stochastic Gradient Descent in ND4J
-* Approach to the Neural Network Framework
-* Activation Functions
-* Cost functions
-* Simple Neural Network on MNIST
-* Generative Adversarial Networks on MNIST.  
 
 ## Choosing a Linear Algebra Library   
 
@@ -182,3 +165,5 @@ tensor: org.nd4j.linalg.api.ndarray.INDArray =
 
 In the next posts, I'll likely focus on ND4J and some operations and processing snippets.  Hope
 you enjoyed!
+
+{% include series.html %}

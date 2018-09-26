@@ -1,8 +1,9 @@
 ---
 layout: post
-title:  "Neural Networks from Scrach Part 2"
+title:  "Operations in ND4J"
 date:   2018-08-20 22:05:00 -0400
-categories: jekyll update
+categories: neural networks from scratch in scala
+series: neural_networks
 math: true
 ---
 
@@ -195,9 +196,11 @@ More elementwise operations are available in `org.nd4j.linalg.ops.transforms.Tra
 
 ## Broadcasting
 
-I really like how ND4J handles broadcasting - it doesn't!  There are methods available to handle this, `addRowVector`, `mulRowVector`, `subRowVector`, and `divRowVector`.  These will be used a lot when we write our framework.  There are similar operations for column vectors.  Moreover, there are inplace versions available, for example `addiRowVector`.  
+I really like how ND4J handles broadcasting.  There are specific methods available for this including `addRowVector`, `addColumnVector` as well as the multiplication, division and subtraction analogs.  In place versions are also available, for example `addiRowVector`These will be used a lot when we write our framework.
 
 ## Matrix Multiplication
+
+
 
 Given two objects, `x` and `y`, of type `INDArray`, that have shapes which make them compatible for matrix mutliplication, we can matrix multiply via
 
@@ -265,3 +268,24 @@ onesAndZeros2: org.nd4j.linalg.api.ndarray.INDArray =
 
 You can pass as many arrys to `vstack` and `hstack` provided they conform in shape.  
 Similarly, you could use `Nd4j.concat(axis: Int, v: INDArrays*)` to accomplish the same, 0 will `hstack`, and 1 will `vstack`.  
+
+
+## Identity Matrics and Matrix Inversion
+
+{% highlight scala %}
+val i = Nd4j.eye(3)
+
+    [[1.00, 0.00, 0.00],
+     [0.00, 1.00, 0.00],
+     [0.00, 0.00, 1.00]]
+{% endhighlight %}
+
+{% highlight scala %}
+import org.nd4j.linalg.inverse.InvertMatrix.invert
+
+val x = Nd4j.randn(4,3)
+val xtx = x.transpose mmul x
+val xtxinv = invert(xtx, false)  // the the boolean will do the inversion in place by provide true
+{% endhighlight %}
+
+{% include series.html %}

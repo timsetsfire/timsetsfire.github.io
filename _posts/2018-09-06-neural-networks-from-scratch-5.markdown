@@ -1,20 +1,36 @@
 ---
 layout: post
-title:  "Neural Networks from Scrach Part 5"
+title:  "Back Propagation"
 date:   2018-09-12 22:05:00 -0400
-categories: jekyll update
+categories: neural networks from scratch in scala
+series: neural_networks
 math: true
 ---
 
 ## Function composition
+<!--
+<ul>
+  {% for post in site.posts %}
+    <li>
+      <a href="{{ post.url }}">{{ post.title }}</a>
+    </li>
+  {% endfor %}
+</ul> -->
+
 
 Function composition can be easily understood as the application of one function to the result of another function to produce a third function.  
 
-Concretely, Suppose that we have a function $h = (g \circ f)(x)$, read $g$ composed with $f$ of $x$, with $f: X \to Y$, g: Y \to Z$, then $h: X \to Z$.  
+Concretely, Suppose that we have a function $h = (g \circ f)(x)$, read $g$ composed with $f$ of $x$, with $f: X \to Y, g: Y \to Z$, then $h: X \to Z$.  
 
-![network2](/assets/networkgraph.png)
+## Function Composition and Feed Forward Networks
 
-Consider the simple network above - The Input and Variable node feed into a Multiply node.  This implies that the value of the Multiply node is obtained by multiplying the value of the Input node and the Variable node.  The Multiply nodes feeds into an Activation node, which, along with another Variable node feed into a Mutlipy Node, et cetera.  The way the values feed forward through this graph is nothing more than evaluation of many function compositions.  What is still not clear is how we learn this graph, which, in this context refers to estimating the parameters of the network (i.e., the values of the Variable nodes).  The standard way to learn neural networks is via gradient based optimization methods, which, obviously, requires us to compute gradients for our trainable parameters, which means we need to pay a visit to our old friend the chain rule!
+![network2](/assets/graph.png)
+
+Consider the simple network above -
+* The Input and Variable node feed into a Multiply node.  This implies that the value of the Multiply node is obtained by multiplying the value of the Input node and the Variable node.  
+* The Multiply nodes feeds into an Activation node, which, along with another Variable node feed into a Mutlipy Node, et cetera.  
+
+The way the values feed forward through this graph is nothing more than evaluation of many function compositions.  What is still not clear is how we learn this graph, which, in this context refers to estimating the parameters of the network (i.e., the values of the Variable nodes).  The standard way to learn neural networks is via gradient based optimization methods, which, obviously, requires us to compute gradients for our trainable parameters, which means we need to pay a visit to our old friend the chain rule!
 
 ## Chain rule
 
@@ -51,8 +67,6 @@ In order to understrand how to use backprop, we first need to visit our old frie
 
 $$h'(x) = g'(f(x))f'(x)$$
 
-
-
 Function composition is exactly how we built our neural network.  We have an input $$x$$ and several hidden layers, which are defined by linear transformations and elementwise operations, which finally terminate at an output value $$\hat{y}$$ which will be compared against our target column via some cost function.  
 
 Consider this simple example
@@ -83,7 +97,7 @@ These are all elementwise and differentiable almost everywhere, so if $Y = \phi(
 
 ## Mean Square Error
 
-This is fairly straight forward.  If $$MSE = \frac{1}{2m}\sum (Y - \hat{Y})^2$$, then we'll calc the partials as follows
+This is fairly straight forward.  Suppose that $Y, \hat{Y}$ are $m \times n$ matrices, then $$MSE = \frac{1}{2m}\sum\sum (Y - \hat{Y})^2$$, then we'll calc the partials as follows
 
 $$\frac{\partial MSE}{\partial Y_{i,j}}  = \frac{1}{m}(Y_{i,j} - \hat{Y}_{i,j})$$
 
@@ -140,6 +154,14 @@ $$\begin{align*}
 \end{align*}
 $$
 
-Un-vectorizing these result gives $\partial H / \partial X = \phi'(X\beta)\beta^T$ and $\partial H / \partial \beta = X^T \phi'(X\beta)$!
+Un-vectorizing these result gives
+
+$$\partial H / \partial X = \phi'(X\beta)\beta^T$$
+
+ and
+
+ $$\partial H / \partial \beta = X^T \phi'(X\beta)!$$
 
 So if $\phi$ were equal to $(y - X\beta)^2$, it is clear how differentiating this with respect to $X$ and $\beta$ result in the $-X^T(y - X\beta)$ and $-(y - X\beta)\beta^T$ respectively.  
+
+{% include series.html %}

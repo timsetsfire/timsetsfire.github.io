@@ -1,8 +1,9 @@
 ---
 layout: post
-title:  "Neural Networks from Scrach Part 3"
+title:  "Linear Regression with ND4J"
 date:   2018-08-29 22:05:00 -0400
-categories: jekyll update
+categories: neural networks from scratch in scala
+series: neural_networks
 math: true
 ---
 
@@ -22,6 +23,8 @@ be used throughout our neural network framework, while introducing a popular met
 
 I'll assume that anyone reading this is familiar with linear regression, so I'll keep those details spares.  Let's jump directly into estimate linear regression with normal equations in ND4J.  
 
+One thing - there is a standardization method available in ND4J which does the transformation in place.  We won't do this, but know that it is available at `org.nd4j.linalg.ops.transform.Transforms`.
+
 In the root of your project folder, create `code/regression.scala`
 
 {% highlight scala %}
@@ -29,7 +32,7 @@ In the root of your project folder, create `code/regression.scala`
 import org.nd4j.linalg.api.ndarray.INDArray
 import org.nd4j.linalg.factory.Nd4j
 import org.nd4s.Implicits._
-import org.nd4j.linalg.ops.transforms.Transforms.{pow,normalizeZeroMeanAndUnitVariance=>stdize}
+import org.nd4j.linalg.ops.transforms.Transforms.pow
 import org.nd4j.linalg.inverse.InvertMatrix.invert
 
 def r2(y: INDArray, yhat: INDArray) = {
@@ -71,21 +74,22 @@ If you aren't familiar with gradient descent, check out wikipedia.  "Stochastic 
 
 The algorithm is as follows
 
-{% highlight scala %}
+```
 while stopping criterion no met do:
   sample a minibatch of m examples from the training set
   computer gradient estimate: g
   update parameters: b -= learning_rate * g
-{% endhighlight %}
+```
 
 Sampling could happen in such a way that the algorithm converges before it every sees all the training examples.  
+
 
 {% highlight scala %}
 
 import org.nd4j.linalg.api.ndarray.INDArray
 import org.nd4j.linalg.factory.Nd4j
 import org.nd4s.Implicits._
-import org.nd4j.linalg.ops.transforms.Transforms.{pow,normalizeZeroMeanAndUnitVariance=>stdize}
+import org.nd4j.linalg.ops.transforms.Transforms.pow
 import org.nd4j.linalg.inverse.InvertMatrix.invert
 
 def r2(y: INDArray, yhat: INDArray) = {
@@ -151,3 +155,5 @@ object SgdRegression extends App {
 }
 SgdRegression.run()
 {% endhighlight %}
+
+{% include series.html %}
