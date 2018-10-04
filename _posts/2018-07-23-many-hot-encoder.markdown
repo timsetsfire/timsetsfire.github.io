@@ -2,7 +2,8 @@
 layout: post
 title:  "Many Hot Encoder"
 date:   2018-07-23 23:05:00 -0400
-categories: jekyll update
+categories: data-processing
+meta: Extension of One Hot Encoding.  Could be described as a pivot.
 ---
 
 source /home/tim/.rvm/scripts/rvm

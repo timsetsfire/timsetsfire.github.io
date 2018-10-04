@@ -2,8 +2,8 @@
 layout: post
 title:  "Linear Regression with ND4J"
 date:   2018-08-29 22:05:00 -0400
-categories: neural networks from scratch in scala
-series: neural_networks
+categories: neural-nets
+series: neural-nets
 math: true
 ---
 

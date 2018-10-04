@@ -2,8 +2,9 @@
 layout: post
 title:  "Neural Networks from Scrach"
 date:   2018-08-20 22:05:00 -0400
-categories: neural networks from scratch in scala
-series: neural_networks
+categories: neural-nets
+series: neural-nets
+meta: Language and inspiration for approach
 ---
 
 
@@ -82,3 +83,4 @@ It will not be able to handle Recurrent Networks or Convolutional Networks.  Tho
 Over the next several posts, I'll discuss
 
 {% include series.html %}
+<a href="{{site.url}}">Index</a>

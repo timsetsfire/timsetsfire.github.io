@@ -1,13 +1,10 @@
 
 
 ```Scala
-%%classpath add mvn 
+%%classpath add mvn
 org.nd4j nd4j-native-platform 0.7.2
 org.nd4j nd4s_2.11 0.7.2
 ```
-
-
-
 
 
 ## Creating an NDArray
@@ -69,7 +66,7 @@ println(x1.transpose)
     [[2.00, 7.00, 6.00],
      [9.00, 5.00, 1.00],
      [4.00, 3.00, 8.00]]
-    
+
     [[2.00, 9.00, 4.00],
      [7.00, 5.00, 3.00],
      [6.00, 1.00, 8.00]]
@@ -196,10 +193,10 @@ println(x1)
 
     row 1
     [10.00, 5.00, 1.00]
-    
+
     modified row 1
     [10.00, 5.00, 1.00]
-    
+
     original INDArray that row 1 came from
     [[2.00, 7.00, 6.00],
      [10.00, 5.00, 1.00],
@@ -275,7 +272,7 @@ println(x)
      [-1.77, 3.22, 10.27],
      [-0.02, -11.85, -6.07],
      [1.03, -4.24, 7.30]]
-    
+
     [[2.10, -14.71, 0.78],
      [-1.77, 3.22, 10.27],
      [-0.02, -11.85, -6.07],
@@ -446,7 +443,7 @@ val zeros = Nd4j.zeros(2,2)
 
 
 ```Scala
-// zeros like 
+// zeros like
 val zerosLikeX = Nd4j.zerosLike(x)
 ```
 
@@ -492,7 +489,7 @@ val onesAndZeros2 = Nd4j.vstack(ones, zeros) // or Nd4j.concat(0, ones, zeros)
 
 
 ```Scala
-// mean of columns 
+// mean of columns
 x.mean(0)
 ```
 
@@ -505,7 +502,7 @@ x.mean(0)
 
 
 ```Scala
-// mean of rows 
+// mean of rows
 x.mean(1)
 ```
 
@@ -513,5 +510,3 @@ x.mean(1)
 
 
     [-0.48, -0.65, 0.98, 0.66]
-
-
