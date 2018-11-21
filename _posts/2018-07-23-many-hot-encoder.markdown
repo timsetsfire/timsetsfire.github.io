@@ -1,14 +1,13 @@
 ---
 layout: post
-title:  "Many Hot Encoder"
+title:  "Pivot"
 date:   2018-07-23 23:05:00 -0400
 categories: data-processing
-meta: Extension of One Hot Encoding.  Could be described as a pivot.
+meta: Pivot in Spark
 ---
 
-source /home/tim/.rvm/scripts/rvm
 
-This post explores the solution to the _Many Hot Encoder_ problem.  I'm dubbing this as _Many Hot Encoder_ because I don't know what else to call this problem.  It may or may not be common, but it is something that I have encountered more than once in my work and I think it is worth sharing with others.  Before getting into Many Hot Encoding, we'll quickly cover _One Hot Encoding_
+This post covers pivoting data in Spark.  As of Spark 2.4.0, I'm not aware of any built ins that can handle this, and I have found myself doing it enough to merit sharing my solution with others.  When I have found myself needing this functionality, it has always been in pursuit of feature construction for some sort of model or other analysis in which this pivoting would be useful.  TO me, it seems that this is a natural extension of one hot encoding.  I recently only found out that this was a built in for SQL Server since SQL Server 2008, see [Pivot](https://docs.microsoft.com/en-us/sql/t-sql/queries/from-using-pivot-and-unpivot?view=sql-server-2017).  Before getting into Many Hot Encoding (aka Pivot), we'll quickly cover _One Hot Encoding_
 
 ## One Hot Encoding
 
@@ -27,9 +26,9 @@ As an example, suppose we have a dataset of subjects, along with a city in which
 |6	|tokyo|0|0|1|
 |..|	..|..|..|..|
 
-## Many Hot Encoder
+## Many Hot Encoder / Pivot
 
-I don't know if it is appropriate to say that the _Many Hot Encoder_ is an extension of the _One Hot Encoder_, but I think it is easily understood as an extension.  Suppose you have a dataset where each record is a subject id, the subject id is not necessarily unique, meaning, it may appear more than once.  This would be typical in a transaction dataset, where records represent a transaction, or a line item from a transaction.  Items / features caught in a transaction
+I like to consider _Many Hot Encoder_ as an extension of the _One Hot Encoder_, but describing it as a pivot is very easy to understand.  Suppose you have a dataset where each record is a subject id, the subject id is not necessarily unique, meaning, it may appear more than once.  This would be typical in a transaction dataset, where records represent a transaction, or a line item from a transaction.  Items / features caught in a transaction
 
 1. subject id
 1. item name / sku / product number
@@ -62,7 +61,7 @@ user|	jumanji|	a quiet place|	game night|	jurasic world|	the last jedi|	heredita
 
 so that we may use it in a machine learning algorithm.
 
-One thing that should be clear is that our date will considerably sparse, if there are around 700 movies released each [year](https://www.quora.com/On-average-how-many-Hollywood-films-are-released-in-a-year)
+One thing that should be clear is that our data will considerably sparse, if there are around 700 movies released each [year](https://www.quora.com/On-average-how-many-Hollywood-films-are-released-in-a-year)
 and if we have 2-3 years of data, our data could become fairly wide.
 
 ## Considerations
@@ -76,7 +75,7 @@ Each of these could change how we would process our dataset, but for our purpose
 
 ## From Scratch Solution
 
-The idea for this is fairly straight forward, we'll create somethign that operates like a Spark StringIndexer, and we'll pivot our data so that the rows are user ids, and the columns are movies (index movies).
+The idea for this is fairly straight forward, we'll create something that operates like a Spark StringIndexer, and we'll pivot our data so that the rows are user ids, and the columns are movies (index movies).
 
 Our from scratch solutuion will be done with all base modules available in Scala, and one Sparse Vector case class meant to efficiently store our movie data.
 
@@ -86,7 +85,7 @@ case class SparseVector(length: Int, indices: Vector[Int], values: Vector[Double
 
 Notice that the constructor for the `SparseVector` takes `length`, `indices` - indices of non-zero values, and finally `values` of the non-zero elements.
 
-The movies will be stored in a `scala.collection.mutable.Map` with movie name as the key and an integer as the value.  This integer will serve as an index in the SparseVector, so that if this integer appears in the `indices` field, then the user has seen the movie.  The general idea, we'll initialize a counter to 0, and as well iterate over each record, if the movie is in the `Map`, then nothing, otherwise, we add the movie to the map as a key, and add the value of the counter as the value, then the counter is inremented by 1.
+The movies will be stored in a `scala.collection.mutable.Map` with movie name as the key and an integer as the value.  This integer will serve as an index in the SparseVector, so that if this integer appears in the `indices` field, then the user has seen the movie.  The general idea, we'll initialize a counter to 0, and as well iterate over each record, if the movie is in the `Map`, then nothing, otherwise, we add the movie to the map as a key, and add the value of the counter as the value, then the counter is incremented by 1.
 
 We'll use `java.util.concurrent.atomic.AtomicInteger` as the counter.
 
